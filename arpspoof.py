@@ -4,10 +4,10 @@ from scapy.all import *
 def usage():
     print("\nARP Spoof/Poison by Dex")
     print()
-    print("Usage: -i <interface> -v <victimip> -r <routerip>")
+    print("Usage: arpspoof.py i <interface> -v <victimip> -r <routerip>")
     
-    print("Example: -i wlp12s0 -v 192.168.0.32 -r 192.168.0.1")
-    print("Example: -i enp2s0 -v 192.168.0.5 -r 192.168.0.1")
+    print("Example: arpspoof.py -i wlp12s0 -v 192.168.0.32 -r 192.168.0.1")
+    print("Example: arpspoof.py -i enp2s0 -v 192.168.0.5 -r 192.168.0.1")
     sys.exit(0)
 
 def main():
