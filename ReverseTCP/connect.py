@@ -1,7 +1,7 @@
 import socket,subprocess
 
 host = '127.0.0.1'
-port = 8001
+port = 8000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
