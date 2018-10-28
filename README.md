@@ -8,4 +8,4 @@ arpspoof.py
 
 ReverseTCP
 
-- only works locally currently.
+- Works on a LAN Network. Need to add more exception handling for connection refused and binding errors.
