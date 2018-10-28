@@ -1,5 +1,12 @@
 import socket,subprocess,getopt,sys,os
 
+if sys.platform == "win32":
+	pass
+else:
+	if os.geteuid() != 0:
+		exit("[!] Root privileges are required to run this script.")
+
+
 def usage():
 
 	print("\nReverse TCP (Client) by Dex")

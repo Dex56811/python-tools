@@ -1,7 +1,10 @@
 import socket,getopt,os,sys
 
-if os.geteuid() != 0:
-	exit("[!] Root privileges are required to run this script.")
+if sys.platform == "win32":
+	pass
+else:
+	if os.geteuid() != 0:
+		exit("[!] Root privileges are required to run this script.")
 
 def usage():
 
