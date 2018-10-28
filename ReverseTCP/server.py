@@ -7,21 +7,21 @@ def usage():
 
 	print("\nReverse TCP (Server) by Dex")
 	print()
-	print("Usage: server.py -p <port>")
-	print("Example: server.py -p 8000")
-	print("Example: server.py -p 1337")
+	print("Usage: server.py -i <ip to listen on> -p <port>")
+	print("Example: server.py -i 192.168.0.60 (internal ip) -p 8000")
+	print("Example: server.py -i 53.63.215.73 (external ip) -p 1337")
 	sys.exit(0)
 
 def main():
 
-	host = '127.0.0.1'
+	host = ''
 	port = 0
 
 	if not len(sys.argv[1:]):
 		usage()
 
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hp:",["help","port="])
+		opts, args = getopt.getopt(sys.argv[1:], "hi:p:",["help","port="])
 	except getopt.GetoptError as err:
 		print(str(err))
 		usage()
@@ -29,9 +29,11 @@ def main():
 	for o,a in opts:
 		if o in ("-h","--help"):
 			usage()
+		elif o in ("-i","--ip"):
+			host = str(sys.argv[2])
 		elif o in("-p","--port"):
 			try:
-				port = int(sys.argv[2])
+				port = int(sys.argv[4])
 			except:
 				exit("[!] Port parameter requires number.\n%s was supplied." % (port))
 		else:
