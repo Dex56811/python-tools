@@ -1,10 +1,6 @@
 import socket,subprocess,getopt,sys,os
 
-if sys.platform == "win32":
-	pass
-else:
-	if os.geteuid() != 0:
-		exit("[!] Root privileges are required to run this script.")
+
 
 
 def usage():
@@ -46,7 +42,10 @@ def main():
 def connect(ip,port):
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-		s.connect((ip,port))
+		try:
+			s.connect((ip,port))
+		except:
+			print("[!] Unable to connect! Is server listening?")
 
 		x_info = ""
 		for x in os.uname():
