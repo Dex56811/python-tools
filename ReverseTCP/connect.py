@@ -14,7 +14,7 @@ def usage():
 
 
 def main():
-	host = ''
+	ip = ''
 	port = 0
 
 	if not len(sys.argv[1:]):
