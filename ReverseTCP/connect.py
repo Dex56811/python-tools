@@ -26,6 +26,7 @@ def main():
 def connect(ip,port):
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		try:
 			s.connect((ip,port))
 		except:
