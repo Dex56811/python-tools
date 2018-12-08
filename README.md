@@ -2,9 +2,9 @@
 
 I just stick (usually networking) python tools that i make in here. You'll need root permissions to run most of these.
 
-arpspoof.py
+**arpspoof.py**
 
-- Works, possibly slowing the log down would work.
+This is a project implementing [Scapy](https://github.com/secdev/scapy)
 
 ReverseTCP
 
